@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
+use Laravel\Sanctum\Sanctum;
 
 class AuthController extends Controller
 {
@@ -61,6 +63,21 @@ class AuthController extends Controller
 
         return $this->success(
            __("Conta criada")
+        );
+    }
+
+    public function logout(): JsonResponse
+    {
+        $token = request()->bearerToken();
+        /** @var PersonalAccessToken $model */
+        $model = Sanctum::$personalAccessTokenModel;
+        $accessToken = $model::findToken($token);
+        $accessToken->delete();
+
+        return $this->success(
+            __("Até a próxima"),
+            null,
+            204
         );
     }
 }
