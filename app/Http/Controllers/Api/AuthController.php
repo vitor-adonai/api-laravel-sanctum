@@ -18,7 +18,7 @@ class AuthController extends Controller
     {
         request()->validate([
            "email" => "required|email",
-           "password" => "required|min:8|max:60",
+           "password" => "required|min:8|max:30",
            "device_name" => "required",
         ]);
 
@@ -39,8 +39,28 @@ class AuthController extends Controller
             [
                 "user" => $user->toArray(),
                 "token" => $token,
-
             ]
+        );
+    }
+
+    public function signup(): JsonResponse
+    {
+        request()->validate([
+            "name" => "required|min:2|max:60",
+            "email" => "required|email|unique:users",
+            "password" => "required|min:8|max:30",
+            "passwordConfirmation" => "required|same:password|min:8|max:30",
+        ]);
+
+        User::create([
+            "name" => request("name"),
+            "email" => request("email"),
+            "password" => bcrypt(request("password")),
+            "created_at" => now()
+        ]);
+
+        return $this->success(
+           __("Conta criada")
         );
     }
 }
